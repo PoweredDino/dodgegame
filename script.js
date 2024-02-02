@@ -1,30 +1,32 @@
 window.addEventListener('load', function(){
+    const sizeModifiering = Math.max(window.innerWidth, window.innerHeight);
+    const averageSize = sizeModifiering/2000;
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
+
     const dataCanvas = document.getElementById("canvas1");
     const dataCtx = canvas.getContext('2d');
     dataCanvas.width = window.innerWidth;
     dataCanvas.height = window.innerHeight;
-    
+
     let gameOver = false;
-    
+
     let score = 0;
-    
-    
+
+
     setInterval(()=>{
         if (!gameOver) {
             score++;
         }
     },1000);
-    
+
     function movingSound() {
         const y = new Audio("Moving Sound.mp3");
         y.play();
     }
-    
+
     function UI() {
         ctx.save();
         ctx.font = "50px Impact";
@@ -60,25 +62,20 @@ window.addEventListener('load', function(){
             ctx.fillText(two, canvas.width/2, canvas.height/2 + 80);
         }
         ctx.restore();
-    
+
     }
-    
-    
+
+
     class Player{
         constructor(){
             this.spriteDiameter = 802;
-            this.diameter = this.spriteDiameter/10;
+            this.diameter = (this.spriteDiameter/10) * averageSize;
             this.x = canvas.width/2;
             this.y = canvas.height/2;
-            this.speed = 20;
+            this.speed = 25 * averageSize;
             this.image = new Image();
             this.image.src = `Star Player.png`;
             this.deletion = false;
-            this.notMoveable = 
-            (this.y < 0) || 
-            (this.y > canvas.height - this.diameter) || 
-            (this.x < 0 - this.diameter) || 
-            (this.x > canvas.width - this.diameter);
         }
         update(event){
             if (event.type === 'keypress') {
@@ -139,12 +136,19 @@ window.addEventListener('load', function(){
                     this.y += this.speed;
                 }
             }
-            else{
-                alert("something is wrong in ur version");
-            }
         }
         draw(){
-            ctx.drawImage(this.image,0, 0, this.spriteDiameter, this.spriteDiameter, this.x, this.y, this.diameter, this.diameter);
+            ctx.drawImage(
+                this.image, 
+                0, 
+                0, 
+                this.spriteDiameter, 
+                this.spriteDiameter, 
+                this.x, 
+                this.y, 
+                this.diameter, 
+                this.diameter
+            );
         }
         checkCollisions(block1, block2, boolean){
             if (boolean === true) {
@@ -182,7 +186,7 @@ window.addEventListener('load', function(){
             };
         })
     }
-    
+
     let blocks = [];
     let createBlockTime = 0;
     let blockInterval = Math.random() * 1750 + 500;
@@ -191,7 +195,7 @@ window.addEventListener('load', function(){
         constructor(){
             this.spriteDiameter = 401;
             this.sizeModifier = Math.random() * 0.2 + 0.1;
-            this.diameter = this.spriteDiameter * this.sizeModifier;
+            this.diameter = (this.spriteDiameter * this.sizeModifier) * averageSize;
             this.x = canvas.width;
             this.y = Math.random() * (canvas.height - this.diameter);
             this.speed = Math.random() * 4 + 1;
@@ -202,7 +206,7 @@ window.addEventListener('load', function(){
             this.color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`
         }
         update(){
-            this.x -= this.speed; 
+            this.x -= this.speed;
             if (this.x < 0 - this.diameter) {
                 this.deletion === true;
             }
@@ -213,7 +217,7 @@ window.addEventListener('load', function(){
             ctx.drawImage(this.image,0, 0, this.spriteDiameter, this.spriteDiameter, this.x, this.y, this.diameter, this.diameter);
         }
     }
-    
+
     function animate(timestamp) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
@@ -241,8 +245,7 @@ window.addEventListener('load', function(){
         
         player.draw();
         lose();
-    
         requestAnimationFrame(animate);
     }
-    animate(0);  
+    animate(0);
 })
