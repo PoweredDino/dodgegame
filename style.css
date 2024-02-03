@@ -1,5 +1,5 @@
 body{
-    background-image: linear-gradient(to bottom, red, brown, black);
+    background-image: linear-gradient(to bottom, rgb(255, 0, 0), rgb(165, 42, 42), rgb(0, 0, 0));
     width: 100vw;
     height: 100vh;
     overflow: hidden;
