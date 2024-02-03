@@ -26,46 +26,10 @@ window.addEventListener('load', function(){
         const y = new Audio("Moving Sound.mp3");
         y.play();
     }
-
-    function UI() {
-        ctx.save();
-        ctx.font = "50px Impact";
-        
-        ctx.textAlign = 'left';
-        ctx.fillStyle = 'black';
-        ctx.fillText("Score: " + score, 50, 75);
-        ctx.fillStyle = 'yellow';
-        ctx.fillText("Score: " + score, 55, 80);
-        
-        if (gameOver) {
-            let one;
-            let two;
-            if (score < 30) {
-                one = "CRUSHED!";
-                two = "YOUR SCORE IS " + score;
-            }
-            else if (score >= 30 && score < 50) {
-                one = "YOU PLAYED BETTER!!";
-                two = "EXCELLENT PLAYING!";
-            }
-            else if (score >= 50 && score < 100) {
-                one = "WONDERFUL PLAYING!!!";
-                two = "GOOD JOB!!";
-            }
-            else{
-                one = "MASTER!!!!";
-                two = "YOU PLAYED REALLY GOOD!!!";
-            }
-            ctx.textAlign = 'center';
-            ctx.fillText(one, canvas.width/2, canvas.height/2 - 20);
-            ctx.font = "25px Impact";
-            ctx.fillText(two, canvas.width/2, canvas.height/2 + 80);
-        }
-        ctx.restore();
-
+    function retrySound() {
+        const g = new Audio("retrySound.mp3");
+        g.play();
     }
-
-
     class Player{
         constructor(){
             this.spriteDiameter = 802;
@@ -120,20 +84,55 @@ window.addEventListener('load', function(){
             }
             else if (event.type === 'click') {
                 if (event.x < window.innerWidth/2 && event.y < window.innerHeight/2) {
-                    this.x -= this.speed;
-                    this.y -= this.speed;
+                    if (this.x > 0 && this.y > 0) {
+                        this.x -= this.speed;
+                        this.y -= this.speed;
+                        if (this.x < 0) {
+                            this.x = 0;
+                        }
+                        else if (this.y < 0) {
+                            this.y = 0;
+                        }
+                    }
+                    
                 }
                 else if (event.x > window.innerWidth/2 && event.y < window.innerHeight/2) {
-                    this.x += this.speed;
-                    this.y -= this.speed;
+                    if (this.x < canvas.width - this.diameter && this.y > 0) {
+                        this.x += this.speed;
+                        this.y -= this.speed;
+                        if (this.x > canvas.width - this.diameter) {
+                        this.x = canvas.width - this.diameter;
+                        }
+                        else if (this.y < 0) {
+                            this.y = 0;
+                        }
+                    }
+                    
                 }
                 else if (event.x < window.innerWidth/2 && event.y > window.innerHeight/2) {
-                    this.x -= this.speed;
-                    this.y += this.speed;
+                    if (this.x > 0 && this.y < canvas.height - this.diameter) {
+                        this.x -= this.speed;
+                        this.y += this.speed;
+                        if (this.x < 0) {
+                            this.x = 0;
+                        }
+                        else if (this.y > canvas.height - this.diameter) {
+                            this.y = canvas.height - this.diameter;
+                        }
+                    }
                 }
                 else if (event.x > window.innerWidth/2 && event.y > window.innerHeight/2) {
-                    this.x += this.speed;
-                    this.y += this.speed;
+                    
+                    if (this.x < canvas.width - this.diameter && this.y < canvas.height - this.diameter) {
+                        this.x += this.speed;
+                        this.y += this.speed;
+                        if (this.x > canvas.width - this.diameter) {
+                            this.x = canvas.width - this.diameter;
+                        }
+                        else if (this.y > canvas.height - this.diameter) {
+                            this.y = canvas.height - this.diameter;
+                        }
+                    }
                 }
             }
         }
@@ -199,6 +198,8 @@ window.addEventListener('load', function(){
             this.x = canvas.width;
             this.y = Math.random() * (canvas.height - this.diameter);
             this.speed = Math.random() * 4 + 1;
+            this.speedX = this.speed;
+            this.speedY = Math.random() * this.speed - this.speed;
             this.image = new Image();
             this.randomImage = Math.floor(Math.random() * 4) + 1;
             this.image.src = `Metal Wall Game Background-0${this.randomImage}.png`;
@@ -206,9 +207,14 @@ window.addEventListener('load', function(){
             this.color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`
         }
         update(){
-            this.x -= this.speed;
+            this.x -= this.speedX;
             if (this.x < 0 - this.diameter) {
                 this.deletion === true;
+            }
+
+            this.y += this.speedY;
+            if (this.y < 0 || this.y > canvas.height - this.diameter) {
+                this.speedY *= -1;
             }
         }
         draw(){
@@ -217,7 +223,72 @@ window.addEventListener('load', function(){
             ctx.drawImage(this.image,0, 0, this.spriteDiameter, this.spriteDiameter, this.x, this.y, this.diameter, this.diameter);
         }
     }
-
+    class Retry{
+        constructor(){
+            this.image = new Image();
+            this.image.src = "Retry.png";
+            this.spriteDiameter = 500;
+            this.diameter = this.spriteDiameter * averageSize/5;
+            this.x = (canvas.width - this.diameter) - this.diameter/2;
+            this.y = this.diameter/2;
+        }
+        update(){
+            score = 0;
+            blocks = [];
+            lastTime = 0;
+            gameOver = false;
+            player.x = canvas.width/2;
+            player.y = canvas.height/2;
+            gameOverSound = true;
+            retrySound();
+        }
+        draw(){
+            ctx.drawImage(this.image, 0, 0, this.spriteDiameter, this.spriteDiameter, this.x, this.y, this.diameter, this.diameter);
+        }
+    }
+    const retry = new Retry();
+    window.addEventListener('click', (e) => {
+        if (e.x > retry.x && e.x < retry.x + retry.diameter && e.y > retry.y && e.y < retry.y + retry.diameter) {
+            retry.update();
+        }
+    })
+    function UI() {
+        const fontSize = averageSize * 75;
+        ctx.save();
+        ctx.font = fontSize + "px Impact";
+        
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'black';
+        ctx.fillText("Score: " + score, (averageSize/26) + 50, (averageSize/26) + 75);
+        ctx.fillStyle = 'yellow';
+        ctx.fillText("Score: " + score, (averageSize/26) + 55, (averageSize/26) + 80);
+        
+        if (gameOver) {
+            let one;
+            let two;
+            if (score < 30) {
+                one = "CRUSHED!";
+                two = "YOUR SCORE IS " + score;
+            }
+            else if (score >= 30 && score < 50) {
+                one = "YOU PLAYED BETTER!!";
+                two = "EXCELLENT PLAYING!";
+            }
+            else if (score >= 50 && score < 100) {
+                one = "WONDERFUL PLAYING!!!";
+                two = "GOOD JOB!!";
+            }
+            else{
+                one = "MASTER!!!!";
+                two = "YOU PLAYED REALLY GOOD!!!";
+            }
+            ctx.textAlign = 'center';
+            ctx.fillText(one, canvas.width/2, canvas.height/2 - 20);
+            ctx.font = fontSize/2 + "px Impact";
+            ctx.fillText(two, canvas.width/2, canvas.height/2 + 80);
+        }
+        ctx.restore();
+    }
     function animate(timestamp) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
@@ -245,6 +316,9 @@ window.addEventListener('load', function(){
         
         player.draw();
         lose();
+
+        retry.draw();
+
         requestAnimationFrame(animate);
     }
     animate(0);
