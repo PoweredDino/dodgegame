@@ -2,7 +2,7 @@
 window.addEventListener('load', function(){
     function isMobile() {
         const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-        return true//regex.test(navigator.userAgent);
+        return regex.test(navigator.userAgent);
     }
 
     const sizeModifiering = Math.max(window.innerWidth, window.innerHeight);
