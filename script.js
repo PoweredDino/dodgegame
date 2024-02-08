@@ -65,7 +65,7 @@ window.addEventListener('load', function(){
         constructor(){
             this.keys = [];
             if (isMobile()) {
-                window.addEventListener('mouseclick', (e) => {
+                window.addEventListener('touchstart', (e) => {
                     if (e.x > ArrowDown.x && e.x < ArrowDown.x + (averageSize * 100) && e.y > ArrowDown.y && e.y < ArrowDown.y + (averageSize * 100)){
                         this.keys.push("ArrowDown");
                     }
@@ -79,7 +79,7 @@ window.addEventListener('load', function(){
                         this.keys.push("ArrowUp");
                     }
                 })
-                window.addEventListener('mouseup', (e) => {
+                window.addEventListener('touchcancel', (e) => {
                     if (e.x > ArrowDown.x && e.x < ArrowDown.x + (averageSize * 100) && e.y > ArrowDown.y && e.y < ArrowDown.y + (averageSize * 100)){
                         this.keys.splice(this.keys.indexOf("ArrowDown"), 1);
                     }
