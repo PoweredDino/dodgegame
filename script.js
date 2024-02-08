@@ -1,4 +1,10 @@
+/**@type {HTMLCanvasElement} */
 window.addEventListener('load', function(){
+    function isMobile() {
+        const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        return true//regex.test(navigator.userAgent);
+    }
+
     const sizeModifiering = Math.max(window.innerWidth, window.innerHeight);
     const averageSize = sizeModifiering/2000;
     const canvas = document.getElementById("canvas1");
@@ -10,6 +16,31 @@ window.addEventListener('load', function(){
     const dataCtx = canvas.getContext('2d');
     dataCanvas.width = window.innerWidth;
     dataCanvas.height = window.innerHeight;
+
+    const ArrowUp = {
+        image: new Image(),
+        x: canvas.width - (sizeModifiering/30) * 7,
+        y: canvas.height - sizeModifiering/10
+    }
+    const ArrowDown = {
+        image: new Image(),
+        x: canvas.width - (sizeModifiering/30) * 3,
+        y: canvas.height - sizeModifiering/10
+    }
+    const ArrowRight = {
+        image: new Image(),
+        x: (sizeModifiering/30) * 4,
+        y: canvas.height - sizeModifiering/10
+    }
+    const ArrowLeft = {
+        image: new Image(),
+        x: (sizeModifiering/30),
+        y: canvas.height - sizeModifiering/10
+    }
+    ArrowUp.image.src = "ArrowUp.png"
+    ArrowDown.image.src = "ArrowDown.png"
+    ArrowLeft.image.src = "ArrowLeft.png"
+    ArrowRight.image.src = "ArrowRight.png"
 
     let gameOver = false;
 
@@ -30,6 +61,61 @@ window.addEventListener('load', function(){
         const g = new Audio("retrySound.mp3");
         g.play();
     }
+    class InputHandler {
+        constructor(){
+            this.keys = [];
+            if (isMobile()) {
+                window.addEventListener('mousedown', (e) => {
+                    if (e.x > ArrowDown.x && e.x < ArrowDown.x + (averageSize * 100) && e.y > ArrowDown.y && e.y < ArrowDown.y + (averageSize * 100)){
+                        this.keys.push("ArrowDown");
+                    }
+                    if (e.x > ArrowLeft.x && e.x < ArrowLeft.x + (averageSize * 100) && e.y > ArrowLeft.y && e.y < ArrowLeft.y + (averageSize * 100)){
+                        this.keys.push("ArrowLeft");
+                    }
+                    if (e.x > ArrowRight.x && e.x < ArrowRight.x + (averageSize * 100) && e.y > ArrowRight.y && e.y < ArrowRight.y + (averageSize * 100)){
+                        this.keys.push("ArrowRight");
+                    }
+                    if (e.x > ArrowUp.x && e.x < ArrowUp.x + (averageSize * 100) && e.y > ArrowUp.y && e.y < ArrowUp.y + (averageSize * 100)){
+                        this.keys.push("ArrowUp");
+                    }
+                })
+                window.addEventListener('mouseup', (e) => {
+                    if (e.x > ArrowDown.x && e.x < ArrowDown.x + (averageSize * 100) && e.y > ArrowDown.y && e.y < ArrowDown.y + (averageSize * 100)){
+                        this.keys.splice(this.keys.indexOf("ArrowDown"), 1);
+                    }
+                    if (e.x > ArrowLeft.x && e.x < ArrowLeft.x + (averageSize * 100) && e.y > ArrowLeft.y && e.y < ArrowLeft.y + (averageSize * 100)){
+                        this.keys.splice(this.keys.indexOf("ArrowLeft"), 1);
+                    }
+                    if (e.x > ArrowRight.x && e.x < ArrowRight.x + (averageSize * 100) && e.y > ArrowRight.y && e.y < ArrowRight.y + (averageSize * 100)){
+                        this.keys.splice(this.keys.indexOf("ArrowRight"), 1);
+                    }
+                    if (e.x > ArrowUp.x && e.x < ArrowUp.x + (averageSize * 100) && e.y > ArrowUp.y && e.y < ArrowUp.y + (averageSize * 100)){
+                        this.keys.splice(this.keys.indexOf("ArrowUp"), 1);
+                    }
+                })
+            } else{
+                window.addEventListener('keydown', (e) => {
+                    if ((   e.key === "ArrowDown" ||
+                            e.key === "ArrowUp" ||
+                            e.key === "ArrowLeft" ||
+                            e.key === "ArrowRight")
+                            && this.keys.indexOf(e.key) === -1) {
+                        this.keys.push(e.key);
+                    }
+                })
+                window.addEventListener('keyup', (e) => {
+                    if (    e.key === "ArrowDown" ||
+                            e.key === "ArrowUp" ||
+                            e.key === "ArrowLeft" ||
+                            e.key === "ArrowRight") {
+                        this.keys.splice(this.keys.indexOf(e.key), 1);
+                    }
+                    
+                })
+            }
+        }
+    }
+    const input = new InputHandler()
     class Player{
         constructor(){
             this.spriteDiameter = 802;
@@ -41,48 +127,46 @@ window.addEventListener('load', function(){
             this.image.src = `Player.png`;
             this.deletion = false;
         }
-        update(event){
-            if (event.type === 'keypress') {
-                switch (event.key) {
-                    case "w":
-                        if (this.y > 0) {
-                            this.y -= this.speed;
-                            this.draw();
-                        } else{
-                            this.y = 0;
-                            this.draw();
-                        }
-                        break;
-                    case "a":
-                        if (this.x > 0) {
-                            this.x -= this.speed;
-                            this.draw();
-                        } else{
-                            this.x = 0;
-                            this.draw();
-                        }
-                        break;
-                    case "s":
-                        if (this.y < (canvas.height - this.diameter)) {
-                            this.y += this.speed;
-                            this.draw();
-                        } else {
-                            this.y = (canvas.height - this.diameter);
-                            this.draw();
-                        }
-                        break;
-                    case "d":
-                        if (this.x < (canvas.width - this.diameter)) {
-                            this.x += this.speed;
-                            this.draw();
-                        } else{
-                            this.x = (canvas.width - this.diameter);
-                            this.draw();
-                        }
-                        break;
+        update(/*event*/){
+            //if (isMobile()) {
+                
+            //} else{
+                let moveable;
+                if (input.keys.includes("ArrowUp")) {
+                    if (this.y > 0) {
+                        this.y -= this.speed
+                    }
+                    else{
+                        this.y = 0
+                    }
                 }
-            }
-            else if (event.type === 'click') {
+                if (input.keys.includes("ArrowDown")) {
+                    if (this.y < canvas.height - this.diameter) {
+                        this.y += this.speed
+                    }
+                    else{
+                        this.y = canvas.height - this.diameter
+                    }
+                }
+                if (input.keys.includes("ArrowRight")) {
+                    if (this.x < canvas.width - this.diameter) {
+                        this.x += this.speed
+                    }
+                    else{
+                        this.x = canvas.width - this.diameter
+                    }
+                }
+                if (input.keys.includes("ArrowLeft")) {
+                    if (this.x > 0) {
+                        this.x -= this.speed
+                    }
+                    else{
+                        this.x = 0
+                    }
+                };
+            //}
+            /*
+            if (event.type === 'click') {
                 if (event.x < window.innerWidth/2 && event.y < window.innerHeight/2) {
                     if (this.x > 0 && this.y > 0) {
                         this.x -= this.speed;
@@ -135,6 +219,7 @@ window.addEventListener('load', function(){
                     }
                 }
             }
+        */
         }
         draw(){
             ctx.drawImage(
@@ -164,14 +249,6 @@ window.addEventListener('load', function(){
         }
     }
     const player = new Player();
-    window.addEventListener('keypress', (e) => {
-        player.update(e);
-        movingSound();
-    });
-    window.addEventListener('click', (e) => {
-        player.update(e);
-        movingSound();
-    })
     let gameOverSound = true;
     function lose() {
         blocks.forEach((block) => {
@@ -253,6 +330,7 @@ window.addEventListener('load', function(){
     }
     const retry = new Retry();
     window.addEventListener('click', (e) => {
+        //retry
         if (e.x > retry.x && e.x < retry.x + retry.diameter && e.y > retry.y && e.y < retry.y + retry.diameter) {
             retry.update();
         }
@@ -319,13 +397,31 @@ window.addEventListener('load', function(){
             block.draw();
         });
         blocks = blocks.filter(object => !object.deletion);
+
         
+        player.update();
         player.draw();
         lose();
 
         retry.draw();
 
+        if (isMobile()) {
+            const diameter = averageSize * 100
+            ctx.drawImage(ArrowLeft.image, 0, 0, 500, 500, ArrowLeft.x, ArrowLeft.y, diameter, diameter)
+            ctx.drawImage(ArrowRight.image, 0, 0, 500, 500, ArrowRight.x, ArrowRight.y, diameter, diameter)
+            ctx.drawImage(ArrowUp.image, 0, 0, 500, 500, ArrowUp.x, ArrowUp.y, diameter, diameter)
+            ctx.drawImage(ArrowDown.image, 0, 0, 500, 500, ArrowDown.x, ArrowDown.y, diameter, diameter)
+        }
+        
         requestAnimationFrame(animate);
     }
     animate(0);
+    setInterval(() => {
+        if (input.keys.length !== 0) {
+            movingSound()
+        }
+        else{
+            return
+        }
+    }, 500)
 })
