@@ -65,21 +65,30 @@ window.addEventListener('load', function(){
         constructor(){
             this.keys = [];
             if (isMobile()) {
-                window.addEventListener('touchstart', (e) => {
+                window.addEventListener('click', (e) => {
                     if (e.x > ArrowDown.x && e.x < ArrowDown.x + (averageSize * 100) && e.y > ArrowDown.y && e.y < ArrowDown.y + (averageSize * 100)){
+                        this.keys = []
                         this.keys.push("ArrowDown");
                     }
-                    if (e.x > ArrowLeft.x && e.x < ArrowLeft.x + (averageSize * 100) && e.y > ArrowLeft.y && e.y < ArrowLeft.y + (averageSize * 100)){
+                    else if (e.x > ArrowLeft.x && e.x < ArrowLeft.x + (averageSize * 100) && e.y > ArrowLeft.y && e.y < ArrowLeft.y + (averageSize * 100)){
+                        this.keys = []
                         this.keys.push("ArrowLeft");
                     }
-                    if (e.x > ArrowRight.x && e.x < ArrowRight.x + (averageSize * 100) && e.y > ArrowRight.y && e.y < ArrowRight.y + (averageSize * 100)){
+                    else if (e.x > ArrowRight.x && e.x < ArrowRight.x + (averageSize * 100) && e.y > ArrowRight.y && e.y < ArrowRight.y + (averageSize * 100)){
+                        this.keys = []
                         this.keys.push("ArrowRight");
                     }
-                    if (e.x > ArrowUp.x && e.x < ArrowUp.x + (averageSize * 100) && e.y > ArrowUp.y && e.y < ArrowUp.y + (averageSize * 100)){
+                    else if (e.x > ArrowUp.x && e.x < ArrowUp.x + (averageSize * 100) && e.y > ArrowUp.y && e.y < ArrowUp.y + (averageSize * 100)){
+                        this.keys = []
                         this.keys.push("ArrowUp");
                     }
+                    else{
+                        this.keys = []
+                    }
                 })
-                window.addEventListener('touchcancel', (e) => {
+                /*
+                window.addEventListener('mouseup', (e) => {
+                    console.log("ending")
                     if (e.x > ArrowDown.x && e.x < ArrowDown.x + (averageSize * 100) && e.y > ArrowDown.y && e.y < ArrowDown.y + (averageSize * 100)){
                         this.keys.splice(this.keys.indexOf("ArrowDown"), 1);
                     }
@@ -93,6 +102,7 @@ window.addEventListener('load', function(){
                         this.keys.splice(this.keys.indexOf("ArrowUp"), 1);
                     }
                 })
+                */
             } else{
                 window.addEventListener('keydown', (e) => {
                     if ((   e.key === "ArrowDown" ||
